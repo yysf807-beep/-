@@ -3,164 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تموج المقص</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="family">
+    <title>تموج المقص - نظام الولاء</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #FFFFFF;
-            --main-text-color: #000000;
-            --input-bg: #F8F9FA;
-            --border-color: #EAEAEA;
-        }
-        body {
-            background-color: #F0F0F0;
-            margin: 0;
-            padding: 0;
-            font-family: 'Tajawal', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .phone-container {
-            width: 100%;
-            max-width: 412px;
-            height: 100vh;
-            background-color: var(--bg-color);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 25px rgba(0,0,0,0.1);
-            overflow-y: auto;
-        }
-        .header {
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: 700;
-            color: #000000;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
-        }
-        .sub-logo {
-            font-size: 12px;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .content {
-            padding: 30px 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .welcome-text {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-        .input-group {
-            margin-bottom: 20px;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 700;
-        }
-        .input-group input {
-            width: 100%;
-            padding: 16px;
-            border: 1px solid var(--border-color);
-            background-color: var(--input-bg);
-            border-radius: 12px;
-            font-size: 16px;
-            box-sizing: border-box;
-            font-family: 'Tajawal', sans-serif;
-            text-align: right;
-        }
-        .btn-submit {
-            width: 100%;
-            padding: 16px;
-            background-color: #000000;
-            color: #FFFFFF;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 10px;
-            font-family: 'Tajawal', sans-serif;
-            transition: background-color 0.2s;
-        }
-        .btn-submit:disabled {
-            background-color: #666666;
-            cursor: not-allowed;
-        }
-        .loyalty-status {
-            display: none;
-            text-align: center;
-            padding: 20px 10px;
-        }
-        .greeting {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 25px;
-            max-width: 300px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .visit-card {
-            aspect-ratio: 1;
-            border: 2px dashed #CCCCCC;
-            border-radius: 16px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 14px;
-            font-weight: 700;
-            color: #999999;
-            position: relative;
-        }
-        .visit-card.active {
-            border-style: solid;
-            border-color: #000000;
-            background-color: #000000;
-            color: #FFFFFF;
-        }
-        .visit-card.gift {
-            border-color: #000000;
-            color: #000000;
-            background-color: #F8F9FA;
-        }
-        .visit-card.gift.active {
-            background-color: #000000;
-            color: #FFFFFF;
-        }
-        .info-note {
-            font-size: 13px;
-            color: #666666;
-            line-height: 1.6;
-            margin-top: 20px;
-        }
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            font-size: 16px;
-            color: #666;
-            margin-top: 10px;
-        }
+        :root { --bg-color: #FFFFFF; --main-text-color: #000000; --input-bg: #F8F9FA; --border-color: #EAEAEA; }
+        body { background-color: #F0F0F0; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .phone-container { width: 100%; max-width: 412px; height: 100vh; background-color: var(--bg-color); position: relative; display: flex; flex-direction: column; box-shadow: 0 4px 25px rgba(0,0,0,0.1); overflow-y: auto; }
+        .header { padding: 30px 20px; text-align: center; border-bottom: 1px solid var(--border-color); }
+        .logo { font-size: 28px; font-weight: 700; color: #000000; letter-spacing: 1px; margin-bottom: 5px; }
+        .sub-logo { font-size: 12px; color: #666; text-transform: uppercase; letter-spacing: 2px; }
+        .content { padding: 30px 20px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .welcome-text { font-size: 22px; font-weight: 700; margin-bottom: 25px; text-align: center; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; }
+        .input-group input { width: 100%; padding: 16px; border: 1px solid var(--border-color); background-color: var(--input-bg); border-radius: 12px; font-size: 16px; box-sizing: border-box; font-family: 'Tajawal', sans-serif; text-align: right; }
+        .btn-submit { width: 100%; padding: 16px; background-color: #000000; color: #FFFFFF; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 10px; font-family: 'Tajawal', sans-serif; transition: background-color 0.2s; }
+        .loyalty-status { display: none; text-align: center; padding: 20px 10px; }
+        .greeting { font-size: 20px; font-weight: 700; margin-bottom: 20px; }
+        
+        /* تعديل شبكة البطاقات لتناسب 5 عناصر */
+        .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 25px; max-width: 320px; margin-left: auto; margin-right: auto; }
+        .visit-card { aspect-ratio: 1; border: 2px dashed #CCCCCC; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 16px; font-weight: 700; color: #999999; }
+        .visit-card.active { border-style: solid; border-color: #000000; background-color: #000000; color: #FFFFFF; }
+        .visit-card.gift { border-color: #000000; color: #000000; background-color: #F8F9FA; grid-column: span 1; }
+        /* جعل آخر بطاقتين في المنتصف إذا لزم الأمر أو تركها 3 ثم 2 */
+        #card-4, #card-5 { grid-column: auto; }
+        
+        .info-note { font-size: 14px; color: #666666; line-height: 1.6; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; }
+        .loading-spinner { display: none; text-align: center; font-size: 14px; color: #666; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -173,7 +43,7 @@
 
     <div class="content">
         <div id="auth-screen">
-            <div class="welcome-text">سجل زيارتك واكسب الرابعة مجاناً!</div>
+            <div class="welcome-text">احلق 4 مرات واكسب الخامسة مجاناً! 🎁</div>
             <div class="input-group">
                 <label>الاسم الكريم</label>
                 <input type="text" id="user-name" placeholder="أدخل اسمك الثنائي">
@@ -183,22 +53,19 @@
                 <input type="tel" id="user-phone" placeholder="05xxxxxxxx" style="direction: ltr;">
             </div>
             <button class="btn-submit" id="submit-btn" onclick="registerVisit()">تأكيد وتسجيل الزيارة</button>
-            <div id="loading" class="loading-spinner">جاري حفظ بياناتك في الجدول...</div>
+            <div id="loading" class="loading-spinner">جاري التحديث...</div>
         </div>
 
         <div id="status-screen" class="loyalty-status">
             <div class="greeting" id="welcome-back">مرحباً بك</div>
-            
             <div class="cards-grid">
                 <div class="visit-card" id="card-1">1</div>
                 <div class="visit-card" id="card-2">2</div>
                 <div class="visit-card" id="card-3">3</div>
-                <div class="visit-card gift" id="card-4">🎁 مجاناً</div>
+                <div class="visit-card" id="card-4">4</div>
+                <div class="visit-card gift" id="card-5">🎁</div>
             </div>
-
-            <div class="info-note" id="status-message">
-                سجل جوالك عند كل زيارة، لتفعيل الخدمة الرابعة المجانية تلقائياً!
-            </div>
+            <div class="info-note" id="status-message"></div>
         </div>
     </div>
 </div>
@@ -206,97 +73,62 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxibKd4s6GgoksZm4RUex4mkXZUtU2Wol6mrP6BZk19zsu-mDIq4u72u0b8JSOetJI/exec";
 
-    // عند فتح الصفحة، التحقق لو كان مسجل محلياً مسبقاً لعرض نقاطه فوراً
     window.onload = function() {
         var savedPhone = localStorage.getItem('barber_user_phone');
         var savedName = localStorage.getItem('barber_user_name');
         var savedVisits = localStorage.getItem('barber_user_visits');
-        
-        if(savedPhone && savedName && savedVisits) {
-            showLoyaltyCard(savedName, parseInt(savedVisits));
-        }
+        if(savedPhone && savedName && savedVisits) { showLoyaltyCard(savedName, parseInt(savedVisits)); }
     };
 
     function registerVisit() {
         var nameInput = document.getElementById('user-name').value.trim();
         var phoneInput = document.getElementById('user-phone').value.trim();
-        var submitBtn = document.getElementById('submit-btn');
-        var loadingDiv = document.getElementById('loading');
+        if(!nameInput || !phoneInput) { alert('الرجاء كتابة الاسم ورقم الجوال.'); return; }
 
-        if(!nameInput || !phoneInput) {
-            alert('الرجاء كتابة الاسم ورقم الجوال بالشكل الصحيح.');
-            return;
-        }
+        document.getElementById('submit-btn').disabled = true;
+        document.getElementById('loading').style.display = "block";
 
-        // إظهار مؤشر التحميل وقفل الزر
-        submitBtn.disabled = true;
-        loadingDiv.style.display = "block";
-
-        var customerData = {
-            name: nameInput,
-            phone: phoneInput
-        };
-
-        // إرسال البيانات فوراً لجدول جوجل شيت
-        fetch(SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(customerData)
-        })
+        fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify({name: nameInput, phone: phoneInput}) })
         .then(function() {
-            // تحديث البيانات محلياً على جهاز العميل لتسريع العرض
             var visits = parseInt(localStorage.getItem('barber_user_visits')) || 0;
-            if (visits < 4) { visits++; } else { visits = 1; } // تصفير العداد بعد الرابعة للبدء من جديد
+            // تصفير العداد بعد الزيارة الخامسة
+            if (visits < 5) { visits++; } else { visits = 1; }
             
             localStorage.setItem('barber_user_phone', phoneInput);
             localStorage.setItem('barber_user_name', nameInput);
             localStorage.setItem('barber_user_visits', visits);
 
-            // إخفاء التحميل وعرض كرت الولاء
-            loadingDiv.style.display = "none";
             showLoyaltyCard(nameInput, visits);
         })
-        .catch(function(error) {
-            console.error("Error!", error);
-            alert("حدث خطأ أثناء الاتصال بالجدول، تم حفظ الزيارة مؤقتاً بجهازك.");
-            loadingDiv.style.display = "none";
-            submitBtn.disabled = false;
-        });
+        .catch(function() { alert("خطأ في الاتصال"); document.getElementById('submit-btn').disabled = false; });
     }
 
     function showLoyaltyCard(name, visits) {
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('status-screen').style.display = 'block';
-        document.getElementById('welcome-back').innerText = "نعيماً وحياك الله يا " + name + " 😍";
+        document.getElementById('welcome-back').innerText = "نعيماً يا " + name + " 😍";
 
-        // تفعيل البطاقات بناءً على عدد الزيارات
-        for(var i = 1; i <= 4; i++) {
+        for(var i = 1; i <= 5; i++) {
             var card = document.getElementById('card-' + i);
             if(i <= visits) {
                 card.classList.add('active');
-                if(i === 4) {
-                    card.innerText = "✓";
-                }
-            } else {
-                card.classList.remove('active');
-            }
+                if(i === 5) card.innerText = "✓";
+            } else { card.classList.remove('active'); }
         }
 
-        // تخصيص الرسالة التوجيهية
         var msg = document.getElementById('status-message');
-        if(visits < 3) {
-            msg.innerHTML = "فاضل لك " + (3 - visits) + " زيارات وتأخذ الحلاقة الرابعة <b>مجاناً بالكامل</b>🎁!";
-        } else if(visits === 3) {
-            msg.innerHTML = "✨ <b>مبارك! زيارتك القادمة هي الرابعة وستكون مجانية بالكامل!</b> ✨";
+        if(visits < 4) {
+            msg.innerHTML = "باقي لك " + (4 - visits) + " زيارات وتأخذ الخامسة <b>مجاناً</b>🎁!";
         } else if(visits === 4) {
-            msg.innerHTML = "تستاهل الهدية! تم استخدام حلاقتك المجانية اليوم بنجاح 🎁. في زيارتك القادمة ستبدأ دورة جديدة لتكسب مجدداً!";
+            msg.innerHTML = "✨ <b>مبارك! زيارتك القادمة هي الخامسة وستكون مجانية!</b> ✨";
+        } else if(visits === 5) {
+            msg.innerHTML = "تستاهل الهدية! استمتع بحلاقتك المجانية اليوم 🎁.";
         }
     }
 </script>
-
 </body>
 </html>
 
+**ملاحظة هامة:** لكي تكتمل العملية بدقة، يفضل تحديث كود "Apps Script" في جوجل شيت ليصبح الحد الأقصى 5 بدلاً من 4 في السطر الذي يحتوي على `currentVisits < 4`.
+
+تم تحديث نظام الولاء لصالون **تموج المقص** بنجاح! يمكنك الآن تجربة العرض الاستراتيجي أعلاه ومشاركة الكود الجديد مع موقعك. هل تحتاج لأي تعديلات إضافية؟
