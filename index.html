@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -11,7 +12,6 @@
             --main-text-color: #000000;
             --input-bg: #F8F9FA;
             --border-color: #EAEAEA;
-            --placeholder-color: #A0A0A0;
         }
         body {
             background-color: #F0F0F0;
@@ -53,7 +53,14 @@
             font-size: 26px;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .naiman-text {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
             line-height: 1.4;
         }
         .instruction {
@@ -74,6 +81,7 @@
             margin-bottom: 25px;
             outline: none;
             font-family: 'Tajawal', sans-serif;
+            box-sizing: border-box;
         }
         .primary-btn {
             width: 100%;
@@ -126,8 +134,9 @@
         <h1>تموج المقص</h1>
     </header>
     <div id="gateScreen" class="screen active">
+        <div class="naiman-text">نعيماً 😍</div>
         <div class="welcome-text">أهلاً بك في تموج المقص</div>
-        <div class="instruction">أدخل الكود السري<br>الموجود أسفل الفاتورة:</div>
+        <div class="instruction">أدخل الكود:</div>
         <input type="number" id="gateInput" placeholder="أدخل الكود هنا">
         <div id="gateError" class="error-msg">عذراً، الكود غير صحيح</div>
         <button class="primary-btn" onclick="verifyGate()">دخول</button>
@@ -180,80 +189,98 @@
     }
     let users = JSON.parse(localStorage.getItem('users') || '[]');
     let currentUser = null;
-    let isCodeVerified = false; 
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+    let isCodeVerified = false;
+
+```
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+function verifyGate() {
+    const val = document.getElementById('gateInput').value;
+    if(val === localStorage.getItem('dailyCode')) {
+        isCodeVerified = true;
+        document.getElementById('gateInput').value = '';
+        showScreen('regScreen');
+    } else {
+        document.getElementById('gateError').style.display = 'block';
     }
-    function verifyGate() {
-        const val = document.getElementById('gateInput').value;
-        if(val === localStorage.getItem('dailyCode')) {
-            isCodeVerified = true; 
-            document.getElementById('gateInput').value = ''; 
-            showScreen('regScreen');
-        } else {
-            document.getElementById('gateError').style.display = 'block';
-        }
+}
+function registerOrCheck() {
+    if (!isCodeVerified) {
+        alert('عذراً، يجب إدخال الكود الصحيح أولاً.');
+        showScreen('gateScreen');
+        return;
     }
-    function registerOrCheck() {
-        if (!isCodeVerified) {
-            alert('عذراً، يجب إدخال كود الفاتورة الصحيح أولاً من الشاشة الرئيسية.');
-            showScreen('gateScreen');
-            return;
-        }
-        const name = document.getElementById('regName').value.trim();
-        const phone = document.getElementById('regPhone').value.trim();
-        if(!name || !phone) return alert('الرجاء تعبئة البيانات');
-        currentUser = users.find(u => u.phone === phone);
-        if(currentUser) {
-            if (currentUser.visits < 4) { currentUser.visits++; }
-            currentUser.name = name; 
-        } else {
-            currentUser = { name, phone, visits: 1 };
-            users.push(currentUser);
-        }
-        localStorage.setItem('users', JSON.stringify(users));
-        isCodeVerified = false; 
-        renderCard();
+    const name = document.getElementById('regName').value.trim();
+    const phone = document.getElementById('regPhone').value.trim();
+    if(!name || !phone) return alert('الرجاء تعبئة البيانات');
+    currentUser = users.find(u => u.phone === phone);
+    if(currentUser) {
+        if (currentUser.visits < 4) { currentUser.visits++; }
+        currentUser.name = name;
+    } else {
+        currentUser = { name, phone, visits: 1 };
+        users.push(currentUser);
     }
-    function renderCard() {
-        document.getElementById('userNameDisp').innerText = currentUser.name;
-        const grid = document.getElementById('pointsGrid');
-        grid.innerHTML = '';
-        for(let i=1; i<=4; i++) {
-            const box = document.createElement('div');
-            box.className = `point-box ${currentUser.visits >= i ? 'active' : ''}`;
-            box.innerText = currentUser.visits >= i ? '✂️' : i;
-            grid.appendChild(box);
-        }
-        if(currentUser.visits >= 4) { document.getElementById('rewardMsg').style.display = 'block'; }
-        showScreen('cardScreen');
+    localStorage.setItem('users', JSON.stringify(users));
+    isCodeVerified = false;
+    // تصدير Excel تلقائي بعد كل تسجيل
+    autoExport();
+    renderCard();
+}
+function autoExport() {
+    let csv = "\uFEFFالاسم,الجوال,الزيارات\n";
+    users.forEach(u => csv += `${u.name},${u.phone},${u.visits}\n`);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'customers.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+function renderCard() {
+    document.getElementById('userNameDisp').innerText = currentUser.name;
+    const grid = document.getElementById('pointsGrid');
+    grid.innerHTML = '';
+    for(let i=1; i<=4; i++) {
+        const box = document.createElement('div');
+        box.className = `point-box ${currentUser.visits >= i ? 'active' : ''}`;
+        box.innerText = currentUser.visits >= i ? '✂️' : i;
+        grid.appendChild(box);
     }
-    function openOwner() {
-        const pass = prompt('أدخل رمز المالك:');
-        if(pass === '2456') {
-            document.getElementById('currentCodeDisp').innerText = localStorage.getItem('dailyCode');
-            showScreen('ownerScreen');
-        } else { alert('خطأ!'); }
+    if(currentUser.visits >= 4) { document.getElementById('rewardMsg').style.display = 'block'; }
+    showScreen('cardScreen');
+}
+function openOwner() {
+    const pass = prompt('أدخل رمز المالك:');
+    if(pass === '2456') {
+        document.getElementById('currentCodeDisp').innerText = localStorage.getItem('dailyCode');
+        showScreen('ownerScreen');
+    } else { alert('خطأ!'); }
+}
+function setManualCode() {
+    const newCode = document.getElementById('manualCode').value;
+    if(newCode) {
+        localStorage.setItem('dailyCode', newCode);
+        document.getElementById('currentCodeDisp').innerText = newCode;
+        alert('تم التحديث!');
     }
-    function setManualCode() {
-        const newCode = document.getElementById('manualCode').value;
-        if(newCode) {
-            localStorage.setItem('dailyCode', newCode);
-            document.getElementById('currentCodeDisp').innerText = newCode;
-            alert('تم التحديث!');
-        }
-    }
-    function downloadData() {
-        let csv = "Name,Phone,Visits\n";
-        users.forEach(u => csv += `${u.name},${u.phone},${u.visits}\n`);
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.setAttribute('href', url);
-        a.setAttribute('download', 'customers.csv');
-        a.click();
-    }
+}
+function downloadData() {
+    let csv = "\uFEFFالاسم,الجوال,الزيارات\n";
+    users.forEach(u => csv += `${u.name},${u.phone},${u.visits}\n`);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'customers.csv');
+    a.click();
+}
+```
+
 </script>
 </body>
 </html>
