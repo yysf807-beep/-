@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تموج المقص</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #FFFFFF;
+            --main-text-color: #000000;
+            --input-bg: #F8F9FA;
+            --border-color: #EAEAEA;
+        }
+        body {
+            background-color: #F0F0F0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .phone-container {
+            width: 100%;
+            max-width: 375px;
+            background-color: var(--bg-color);
+            border-radius: 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        header {
+            padding: 50px 20px 20px 20px;
+            text-align: center;
+        }
+        .naeman {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: block;
+        }
+        header h1 {
+            font-size: 38px;
+            margin: 0;
+            font-weight: 700;
+            color: var(--main-text-color);
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #C5A880;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+        .screen {
+            display: none;
+            padding: 20px 25px 40px 25px;
+            flex-direction: column;
+            align-items: center;
+        }
+        .screen.active { display: flex; }
+        .welcome-text {
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+        .instruction {
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+        input {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 18px;
+            padding: 20px;
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 25px;
+            outline: none;
+            font-family: 'Tajawal', sans-serif;
+            box-sizing: border-box;
+        }
+        .primary-btn {
+            width: 100%;
+            background-color: #C5A880;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 18px;
+            padding: 20px;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 30px;
+            box-sizing: border-box;
+        }
+        .owner-link-spacer { height: 120px; }
+        .owner-link {
+            text-align: center;
+            color: #999;
+            text-decoration: underline;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: auto;
+            margin-bottom: 30px;
+        }
+        .error-msg { color: red; font-size: 14px; margin-bottom: 10px; display: none; }
+        .points-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+            margin: 20px 0;
+        }
+        .point-box {
+            aspect-ratio: 1;
+            border: 2px dashed #DDD;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 35px;
+        }
+        .point-box.active {
+            border: 2px solid #C5A880;
+            background-color: #FFFDF5;
+        }
+    </style>
+</head>
+<body>
+<div class="phone-container">
+    <header>
+        <div class="naeman">نعيماً😍</div>
+        <h1>تموج المقص</h1>
+        <div class="subtitle">WAVE & SCISSORS</div>
+    </header>
+    
+    <div id="gateScreen" class="screen active">
+        <div class="welcome-text">أهلاً بك في تموج المقص</div>
+        <div class="instruction">أدخل الكود فقط:</div>
+        <input type="number" id="gateInput" placeholder="أدخل الكود هنا">
+        <div id="gateError" class="error-msg">عذراً، الكود غير صحيح</div>
+        <button class="primary-btn" onclick="verifyGate()">دخول</button>
+        <div class="owner-link-spacer"></div>
+        <div class="owner-link" onclick="openOwner()">لوحة تحكم المالك</div>
+    </div>
+
+    <div id="regScreen" class="screen">
+        <div class="welcome-text">تأكيد الحساب</div>
+        <div class="instruction">أدخل بياناتك لتحديث أو تفعيل بطاقتك:</div>
+        <input type="text" id="regName" placeholder="الاسم الكريم">
+        <input type="tel" id="regPhone" placeholder="رقم الجوال">
+        <button class="primary-btn" onclick="registerOrCheck()">تأكيد وتجميع النقاط</button>
+    </div>
+
+    <div id="cardScreen" class="screen">
+        <div class="instruction">بطاقة الولاء الخاصة بك ✂️</div>
+        <p style="font-size: 18px; font-weight: bold;">مرحباً بك: <span id="userNameDisp"></span></p>
+        <div class="points-grid" id="pointsGrid"></div>
+        <div id="rewardMsg" style="display:none; text-align:center; color:#000000; font-weight:bold; margin-top:15px;">
+            مبروك الزيارة الجاية مجانية 🎉 حياك صديقي ونعيماً مقدماً 😎
+        </div>
+        <p style="color: #666; font-size: 13px; text-align: center; margin-top: 20px; line-height: 1.4;">
+            * يتم إضافة النقاط تلقائياً عند مسح الفاتورة الجديدة في زيارتك القادمة.
+        </p>
+        <button onclick="location.reload()" class="primary-btn" style="font-size: 16px; padding: 10px; margin-top: 20px; background:#666;">خروج</button>
+    </div>
+
+    <div id="ownerScreen" class="screen">
+        <div class="instruction">إدارة الصالون 👑</div>
+        <div style="background:#f9f9f9; padding:15px; border-radius:10px; width:100%; text-align:center; margin-bottom:10px; box-sizing: border-box;">
+            الكود الحالي: <strong id="currentCodeDisp" style="color:#000000; font-size:20px;"></strong>
+        </div>
+        <input type="number" id="manualCode" placeholder="تغيير الكود يدوياً">
+        <button class="primary-btn" style="margin-bottom:10px" onclick="setManualCode()">تحديث الكود</button>
+        <button class="primary-btn" style="background:#000; color:#fff; font-size:16px;" onclick="downloadData()">تحميل بيانات العملاء (Excel)</button>
+        <button class="primary-btn" style="background:#666; color:#fff; margin-top:10px" onclick="showScreen('gateScreen')">إغلاق</button>
+    </div>
+</div>
+
+<script>
+    function generateDailyCode() {
+        const today = new Date();
+        const seed = today.getFullYear() + (today.getMonth() + 1) + today.getDate();
+        return ( (seed * 123) % 9000 + 1000 ).toString();
+    }
+    if(!localStorage.getItem('dailyCode')) {
+        localStorage.setItem('dailyCode', generateDailyCode());
+        localStorage.setItem('lastUpdate', new Date().toDateString());
+    }
+    if(localStorage.getItem('lastUpdate') !== new Date().toDateString()) {
+        localStorage.setItem('dailyCode', generateDailyCode());
+        localStorage.setItem('lastUpdate', new Date().toDateString());
+    }
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+    let currentUser = null;
+    let isCodeVerified = false; 
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+    function verifyGate() {
+        const val = document.getElementById('gateInput').value;
+        if(val === localStorage.getItem('dailyCode')) {
+            isCodeVerified = true; 
+            document.getElementById('gateInput').value = ''; 
+            showScreen('regScreen');
+        } else {
+            document.getElementById('gateError').style.display = 'block';
+        }
+    }
+    function registerOrCheck() {
+        if (!isCodeVerified) {
+            alert('عذراً، يجب إدخال كود الفاتورة الصحيح أولاً من الشاشة الرئيسية.');
+            showScreen('gateScreen');
+            return;
+        }
+        const name = document.getElementById('regName').value.trim();
+        const phone = document.getElementById('regPhone').value.trim();
+        if(!name || !phone) return alert('الرجاء تعبئة البيانات');
+        currentUser = users.find(u => u.phone === phone);
+        if(currentUser) {
+            if (currentUser.visits < 4) { currentUser.visits++; }
+            currentUser.name = name; 
+        } else {
+            currentUser = { name, phone, visits: 1 };
+            users.push(currentUser);
+        }
+        localStorage.setItem('users', JSON.stringify(users));
+        isCodeVerified = false; 
+        renderCard();
+    }
+    function renderCard() {
+        document.getElementById('userNameDisp').innerText = currentUser.name;
+        const grid = document.getElementById('pointsGrid');
+        grid.innerHTML = '';
+        for(let i=1; i<=4; i++) {
+            const box = document.createElement('div');
+            box.className = `point-box ${currentUser.visits >= i ? 'active' : ''}`;
+            box.innerText = currentUser.visits >= i ? '✂️' : i;
+            grid.appendChild(box);
+        }
+        if(currentUser.visits >= 4) { document.getElementById('rewardMsg').style.display = 'block'; }
+        showScreen('cardScreen');
+    }
+    function openOwner() {
+        const pass = prompt('أدخل رمز المالك:');
+        if(pass === '2456') {
+            document.getElementById('currentCodeDisp').innerText = localStorage.getItem('dailyCode');
+            showScreen('ownerScreen');
+        } else { alert('خطأ!'); }
+    }
+    function setManualCode() {
+        const newCode = document.getElementById('manualCode').value;
+        if(newCode) {
+            localStorage.setItem('dailyCode', newCode);
+            document.getElementById('currentCodeDisp').innerText = newCode;
+            alert('تم التحديث!');
+        }
+    }
+    function downloadData() {
+        let csv = "\uFEFFName,Phone,Visits\n";
+        users.forEach(u => csv += `${u.name},${u.phone},${u.visits}\n`);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'customers.csv');
+        a.click();
+    }
+</script>
+</body>
+</html>
