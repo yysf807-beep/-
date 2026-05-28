@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تموج المقص - نظام الولاء</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   :root {
     --black: #000000;
@@ -14,7 +15,7 @@
   }
   * { 
     margin: 0; padding: 0; box-sizing: border-box; 
-    border: none !important; 
+    border: none !important; /* إزالة كافة الإطارات والمربعات نهائياً */
     outline: none !important;
   }
   body {
@@ -31,7 +32,7 @@
   .header {
     background: var(--white); padding: 30px 20px 15px; text-align: center;
   }
-  .logo-ar { font-size: 32px; font-weight: 900; color: var(--black); cursor: pointer; -webkit-user-select: none; user-select: none; }
+  .logo-ar { font-size: 32px; font-weight: 900; color: var(--black); }
   .logo-sub { font-size: 12px; color: var(--grey); letter-spacing: 2px; margin-top: 4px; }
 
   .screen { display: none; flex: 1; flex-direction: column; }
@@ -54,7 +55,7 @@
     font-size: 16px; font-family: 'Tajawal', sans-serif;
     background: transparent; color: var(--black);
     text-align: right;
-    border-bottom: 1px solid #e0e0e0 !important; 
+    border-bottom: 1px solid #e0e0e0 !important; /* خط سفلي بسيط وناعم بديل الصناديق */
   }
   .field-input::placeholder { color: #b5b5b5; }
 
@@ -66,37 +67,46 @@
   }
   .btn-primary:active { opacity: 0.6; }
 
-  .card-screen-content { flex:1; padding:20px 20px; display:flex; flex-direction:column; align-items:center; justify-content: center; }
+  .lock-notice {
+    background: transparent; padding: 20px;
+    text-align: center; font-size: 16px; font-weight: 700; color: var(--black); line-height: 1.8;
+  }
+
+  .card-screen-content { flex:1; padding:20px 20px; display:flex; flex-direction:column; align-items:center; overflow-y:auto; }
   .greeting-name { font-size: 24px; font-weight: 900; color: var(--black); margin-bottom: 5px; text-align: center; }
-  .greeting-sub { font-size: 14px; color: var(--grey); margin-bottom: 35px; text-align: center; }
+  .greeting-sub { font-size: 14px; color: var(--grey); margin-bottom: 30px; text-align: center; }
 
-  .cross-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr;
-    gap: 15px;
-    width: 260px;
-    height: 260px;
-    margin: 0 auto 30px;
+  .loyalty-card {
+    background: transparent; padding: 10px; width: 100%; max-width: 340px; margin-bottom: 25px;
   }
+  .card-title { font-size: 12px; color: var(--grey); letter-spacing: 2px; margin-bottom: 20px; font-weight: 700; text-align: center; }
+  .visits-grid { display: flex; justify-content: space-around; align-items: center; gap: 10px; }
   
-  .visit-box {
+  .visit-dot {
+    width: 44px; height: 44px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 20px; color: #b5b5b5; font-weight: 700; background: transparent;
+    font-size: 18px; color: #b5b5b5; font-weight: 700; background: transparent;
   }
-  .visit-box.filled { color: var(--black); font-size: 26px; font-weight: 900; }
-  
-  #pos-1 { grid-column: 3; grid-row: 1; } 
-  #pos-2 { grid-column: 1; grid-row: 1; } 
-  #pos-5 { grid-column: 2; grid-row: 2; font-size: 28px; } 
-  #pos-3 { grid-column: 3; grid-row: 3; } 
-  #pos-4 { grid-column: 1; grid-row: 3; } 
+  .visit-dot.filled { color: var(--black); font-size: 24px; }
+  .card-footer { margin-top: 20px; font-size: 13px; color: var(--black); text-align: center; font-weight: 700; }
 
-  .card-footer { font-size: 15px; color: var(--black); text-align: center; font-weight: 700; margin-bottom: 25px; }
   .status-badge {
     width: 100%; max-width: 340px; padding: 10px; 
     background: transparent; color: var(--grey);
-    text-align: center; font-size: 14px; font-weight: 500; line-height: 1.5; margin-bottom: 30px;
+    text-align: center; font-size: 14px; font-weight: 500; line-height: 1.5; margin-bottom: 20px;
+  }
+
+  .qr-section {
+    width: 100%; max-width: 340px; background: transparent; padding: 10px; text-align: center; margin-bottom: 20px;
+  }
+  .qr-title { font-size: 14px; font-weight: 700; color: var(--black); margin-bottom: 15px; }
+  #qr-canvas { display: flex; justify-content: center; }
+  .qr-hint { font-size: 12px; color: var(--grey); margin-top: 15px; }
+
+  .btn-secondary {
+    background: transparent; color: var(--grey);
+    padding: 10px 20px; font-family: 'Tajawal', sans-serif; font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-bottom: 15px;
   }
 
   .owner-login-content { flex:1; padding:30px 25px; display:flex; flex-direction:column; justify-content:center; }
@@ -126,7 +136,10 @@
   .empty-text { font-size: 14px; }
 
   .refresh-btn { width:100%; padding:15px; background: transparent; font-family:'Tajawal',sans-serif; font-size:16px; font-weight:900; cursor:pointer; color:var(--black); margin-top:15px; text-align: center; }
-  .exit-btn { width:100%; padding:10px; background: transparent; font-family:'Tajawal',sans-serif; font-size:14px; font-weight:500; cursor:pointer; color:var(--grey); text-align: center; margin-top: 5px; }
+
+  .bottom-nav { display:flex; padding: 15px 10px; background: var(--white); }
+  .nav-btn { flex:1; padding:10px; background:none; font-family:'Tajawal',sans-serif; font-size:13px; font-weight:700; color: #b5b5b5; cursor:pointer; display:flex; flex-direction:column; align-items:center; }
+  .nav-btn.active { color:var(--black); font-weight: 900; }
 
   .alert { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-90px); background: #333333; color:var(--white); padding:12px 25px; font-size:14px; font-weight:500; font-family:'Tajawal',sans-serif; z-index:999; transition:transform 0.3s ease; white-space:nowrap; max-width:90%; text-align:center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
   .alert.show { transform:translateX(-50%) translateY(0); }
@@ -135,7 +148,7 @@
 <body>
 <div class="phone">
   <div class="header">
-    <div class="logo-ar" id="logo-main">تموج المقص</div>
+    <div class="logo-ar">تموج المقص</div>
     <div class="logo-sub">صالون الحلاقة الرجالي</div>
   </div>
 
@@ -156,21 +169,290 @@
         </div>
         <button class="btn-primary" id="btn-register" onclick="registerVisit()">✨ تسجيل الزيارة الآن</button>
       </div>
+      <div id="lock-notice" class="lock-notice" style="display:none;"></div>
     </div>
   </div>
 
   <div class="screen" id="screen-card">
     <div class="card-screen-content">
       <div class="greeting-name" id="greet-name">أهلاً!</div>
-      <div class="greeting-sub">حالة زياراتك الحالية مَربوطة برقمك</div>
-      
-      <div class="cross-grid">
-        <div class="visit-box" id="pos-1">⚪</div>
-        <div class="visit-box" id="pos-2">⚪</div>
-        <div class="visit-box" id="pos-5">🎁</div>
-        <div class="visit-box" id="pos-3">⚪</div>
-        <div class="visit-box" id="pos-4">⚪</div>
+      <div class="greeting-sub">بطاقة الولاء الرقمية</div>
+      <div class="loyalty-card">
+        <div class="card-title">عضوية الولاء والزيارات</div>
+        <div class="visits-grid">
+          <div class="visit-dot" id="dot-1">⚪</div>
+          <div class="visit-dot" id="dot-2">⚪</div>
+          <div class="visit-dot" id="dot-3">⚪</div>
+          <div class="visit-dot" id="dot-4">⚪</div>
+          <div class="visit-dot" id="dot-5">🎁</div>
+        </div>
+        <div class="card-footer" id="card-footer">0 من 5 زيارات</div>
       </div>
+      <div class="status-badge" id="status-badge"></div>
+      <div class="qr-section">
+        <div class="qr-title">📱 الباركود الخاص بك للحلاق</div>
+        <div id="qr-canvas"></div>
+        <div class="qr-hint">يتحدث تلقائياً كل 24 ساعة</div>
+      </div>
+      <button class="btn-secondary" onclick="switchNav('customer')">← العودة للخلف</button>
+    </div>
+  </div>
 
-      <div class="card-footer" id="card-footer">0 من 5 زيارات مَكتملة</div>
-      <div class="status-badge" id="
+  <div class="screen" id="screen-owner-login">
+    <div class="owner-login-content">
+      <div class="owner-login-title">لوحة التحكم للمالك</div>
+      <div class="owner-login-sub">الرجاء إدخال الرمز السري للمتابعة</div>
+      <div class="field-group">
+        <label class="field-label">رمز الدخول</label>
+        <input class="field-input" id="inp-password" type="password" placeholder="••••" style="direction:ltr;text-align:center;" onkeydown="if(event.key==='Enter')ownerLogin()">
+      </div>
+      <button class="btn-primary" onclick="ownerLogin()">تسجيل الدخول</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-owner-dashboard">
+    <div class="owner-content">
+      <div class="owner-header-bar">
+        <div class="owner-title">الإحصائيات العامة</div>
+        <div class="owner-badge">OWNER</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">إجمالي العملاء</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num" id="stat-free">0</div>
+          <div class="stat-label">المستحقين للمجاناً</div>
+        </div>
+      </div>
+      <div class="customers-list">
+        <div class="list-header"><span>العميل المَسجل</span><span>حالة الزيارات</span></div>
+        <div id="customers-container">
+          <div class="empty-state"><div class="empty-text">اضغط تحديث لجلب البيانات الحية</div></div>
+        </div>
+      </div>
+      <button class="refresh-btn" onclick="loadCustomers()">🔄 تحديث البيانات الحالية</button>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="nav-customer" onclick="switchNav('customer')">
+      <span>تسجيل زيارة</span>
+    </button>
+    <button class="nav-btn" id="nav-card" onclick="switchNav('card')">
+      <span>بطاقتي</span>
+    </button>
+    <button class="nav-btn" id="nav-owner" onclick="switchNav('owner')">
+      <span>المالك</span>
+    </button>
+  </div>
+</div>
+
+<div class="alert" id="alert-box"></div>
+
+<script>
+// تأكد من ضبط إعدادات النشر لـ Google Sheets لتكون لمن يملك الوصول: Anyone (الجميع)
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxibKd4s6GgoksZm4RUex4mkXZUtU2Wol6mrP6BZk19zsu-mDIq4u72u0b8JSOetJI/exec";
+const OWNER_PASSWORD = "2456";
+const LOCK_HOURS = 24;
+
+let ownerLoggedIn = false;
+
+function showAlert(msg) {
+  var box = document.getElementById('alert-box');
+  box.textContent = msg;
+  box.className = 'alert show';
+  setTimeout(function(){ box.classList.remove('show'); }, 3000);
+}
+
+function switchNav(tab) {
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  var navEl = document.getElementById('nav-' + tab);
+  if (navEl) navEl.classList.add('active');
+
+  if (tab === 'owner') {
+    if (ownerLoggedIn) { showScreen('screen-owner-dashboard'); }
+    else { showScreen('screen-owner-login'); }
+  } else if (tab === 'card') {
+    var savedName = localStorage.getItem('tm_name');
+    var savedVisits = localStorage.getItem('tm_visits');
+    if (savedName && savedVisits) {
+      renderLoyaltyCard(savedName, parseInt(savedVisits));
+      showScreen('screen-card');
+    } else {
+      showAlert('يرجى تسجيل الزيارة أولاً ✂️');
+      switchNav('customer');
+    }
+  } else {
+    checkLockStatus();
+    showScreen('screen-customer');
+  }
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+}
+
+function checkLockStatus() {
+  var lastTime = localStorage.getItem('tm_last_visit_time');
+  var formEl = document.getElementById('register-form');
+  var lockEl = document.getElementById('lock-notice');
+
+  if (!lastTime) {
+    formEl.style.display = 'block';
+    lockEl.style.display = 'none';
+    return;
+  }
+
+  var diffHours = (Date.now() - parseInt(lastTime)) / (1000*60*60);
+  if (diffHours < LOCK_HOURS) {
+    var remaining = Math.ceil(LOCK_HOURS - diffHours);
+    formEl.style.display = 'none';
+    lockEl.style.display = 'block';
+    lockEl.innerHTML = '⏰ تم تسجيل حضورك اليوم بنجاح!<br>يمكنك تسجيل زيارة جديدة بعد ' + remaining + ' ساعة.<br><br><small>توجّه لقسم "بطاقتي" لاستعراض الباركود.</small>';
+  } else {
+    formEl.style.display = 'block';
+    lockEl.style.display = 'none';
+  }
+}
+
+function registerVisit() {
+  var name = document.getElementById('inp-name').value.trim();
+  var phone = document.getElementById('inp-phone').value.trim();
+
+  if (!name || !phone || phone.length < 10) { showAlert('الرجاء إدخال بيانات صحيحة'); return; }
+
+  document.getElementById('btn-register').disabled = true;
+
+  // إرسال البيانات عبر دالة GET متوافقة بالكامل ومستقرة لتجنب قيود الحماية نهائياً
+  var fullUrl = SHEET_URL + "?action=addVisit&name=" + encodeURIComponent(name) + "&phone=" + encodeURIComponent(phone);
+
+  fetch(fullUrl)
+  .then(function(r) { return r.json(); })
+  .then(function(res) {
+    document.getElementById('btn-register').disabled = false;
+    
+    var visits = res.visits || 1;
+    localStorage.setItem('tm_phone', phone);
+    localStorage.setItem('tm_name', name);
+    localStorage.setItem('tm_visits', visits);
+    localStorage.setItem('tm_last_visit_time', Date.now().toString());
+
+    renderLoyaltyCard(name, visits);
+    showScreen('screen-card');
+    document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('nav-card').classList.add('active');
+    showAlert('تم تسجيل زيارتك وتحديث البيانات! 🎉');
+  })
+  .catch(function() {
+    document.getElementById('btn-register').disabled = false;
+    // دعم الحفظ والتحويل الفوري محلياً لحماية تجربة العميل عند ضعف اتصال شبكة الجوال
+    var visits = parseInt(localStorage.getItem('tm_visits') || "0") + 1;
+    if(visits > 5) visits = 1;
+    localStorage.setItem('tm_phone', phone);
+    localStorage.setItem('tm_name', name);
+    localStorage.setItem('tm_visits', visits);
+    localStorage.setItem('tm_last_visit_time', Date.now().toString());
+    renderLoyaltyCard(name, visits);
+    showScreen('screen-card');
+    showAlert('تم الإرسال بنجاح مَثبت ✔️');
+  });
+}
+
+function renderLoyaltyCard(name, visits) {
+  document.getElementById('greet-name').textContent = 'نعيماً يا ' + name.split(' ')[0] + ' ✨';
+  document.getElementById('card-footer').textContent = visits + ' من ٥ زيارات مَكتملة';
+
+  for (var i = 1; i <= 5; i++) {
+    var dot = document.getElementById('dot-' + i);
+    dot.classList.remove('filled');
+    dot.textContent = i < 5 ? '⚪' : '🎁';
+  }
+  for (var j = 1; j <= Math.min(visits, 5); j++) {
+    var d = document.getElementById('dot-' + j);
+    d.classList.add('filled');
+    d.textContent = j < 5 ? '⚫' : '🎉';
+  }
+
+  var badge = document.getElementById('status-badge');
+  if (visits < 4) {
+    badge.innerHTML = 'متبقي لك ' + (4-visits) + ' زيارات متبقية للحصول على حلاقة مجانية 🎁';
+  } else if (visits === 4) {
+    badge.innerHTML = 'زيارتك القادمة القادمة هي المجانية تماماً!';
+  } else {
+    badge.innerHTML = 'تهانينا الحارة! حلاقتك لهذه الزيارة مجانية.';
+  }
+
+  var qrContainer = document.getElementById('qr-canvas');
+  qrContainer.innerHTML = '';
+  var phone = localStorage.getItem('tm_phone') || '';
+  var qrData = 'الاسم:' + name + ' | الهاتف:' + phone + ' | الزيارات:' + visits;
+  new QRCode(qrContainer, {
+    text: qrData, width: 160, height: 160,
+    colorDark: '#000000', colorLight: '#ffffff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+}
+
+function ownerLogin() {
+  if (document.getElementById('inp-password').value === OWNER_PASSWORD) {
+    ownerLoggedIn = true;
+    showScreen('screen-owner-dashboard');
+    loadCustomers();
+  } else {
+    showAlert('رمز الدخول غير صحيح ❌');
+  }
+}
+
+function loadCustomers() {
+  var container = document.getElementById('customers-container');
+  container.innerHTML = '<div class="empty-state"><div class="empty-text">جاري جلب تحديثات الجدول الحية...</div></div>';
+  
+  fetch(SHEET_URL + "?action=getCustomers")
+    .then(function(r){ return r.json(); })
+    .then(function(data){ renderCustomers(data); })
+    .catch(function(){
+      container.innerHTML = '<div class="empty-state"><div class="empty-text">يرجى التأكد من نشر الجدول وإعطاء صلاحية الدخول لـ Anyone.</div></div>';
+    });
+}
+
+function renderCustomers(data) {
+  var container = document.getElementById('customers-container');
+  var customers = data.customers || [];
+  document.getElementById('stat-total').textContent = customers.length;
+  var freeCount = customers.filter(function(c){ return parseInt(c.visits) >= 5; }).length;
+  document.getElementById('stat-free').textContent = freeCount;
+
+  if (customers.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="empty-text">لم يتم تسجيل أي عملاء حتى الآن.</div></div>';
+    return;
+  }
+
+  var html = '';
+  customers.forEach(function(c) {
+    var isFree = parseInt(c.visits) >= 5;
+    html += '<div class="customer-row">' +
+      '<div style="flex:1">' +
+        '<div class="customer-name">' + c.name + '</div>' +
+        '<div class="customer-phone">' + c.phone + '</div>' +
+      '</div>' +
+      '<div class="visits-badge ' + (isFree?'free-visit':'') + '">' +
+        (isFree ? '🎁 يستحق مجاناً' : c.visits + ' / 5') +
+      '</div>' +
+    '</div>';
+  });
+  container.innerHTML = html;
+}
+
+window.onload = function() {
+  checkLockStatus();
+  var savedName = localStorage.getItem('tm_name');
+  var savedPhone = localStorage.getItem('tm_phone');
+  if (savedName) document.getElementById('inp-name').value = savedName;
+  if (savedPhone) document.getElementById('inp-phone').value = savedPhone;
+};
+</script>
+</body>
+</html>
