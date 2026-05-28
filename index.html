@@ -402,6 +402,16 @@ document.getElementById('logo-main').addEventListener('click', () => {
 // ══════════════════════════════════════════════
 //  REGISTER VISIT
 // ══════════════════════════════════════════════
+function isSameDay(iso1, iso2) {
+  return iso1.slice(0,10) === iso2.slice(0,10);
+}
+
+function daysBetween(iso1, iso2) {
+  const d1 = new Date(iso1.slice(0,10));
+  const d2 = new Date(iso2.slice(0,10));
+  return Math.abs((d2 - d1) / (1000 * 60 * 60 * 24));
+}
+
 function registerVisit() {
   const name  = document.getElementById('inp-name').value.trim();
   const phone = document.getElementById('inp-phone').value.trim().replace(/\s+/g,'');
@@ -417,18 +427,30 @@ function registerVisit() {
   if (!customers[phone]) {
     customers[phone] = { name, phone, pin, visits: [], freeUsed: 0 };
   } else {
-    // Update name and pin
     customers[phone].name = name;
     customers[phone].pin  = pin;
   }
 
   const c = customers[phone];
-  const cycleVisits = c.visits.length % 5; // where are we in current cycle
 
-  // Check if free visit eligible
+  // ── Block: same day ──
+  if (c.visits.length > 0) {
+    const lastDate = c.visits[c.visits.length - 1].date;
+    if (isSameDay(lastDate, now)) {
+      showAlert('⛔ سجّلت زيارة اليوم مسبقاً');
+      return;
+    }
+    // ── Block: less than 3 days ──
+    if (daysBetween(lastDate, now) < 3) {
+      const remaining = 3 - Math.floor(daysBetween(lastDate, now));
+      showAlert('⏳ يجب الانتظار ' + remaining + ' يوم قبل الزيارة التالية');
+      return;
+    }
+  }
+
+  const cycleVisits = c.visits.length % 5;
   const totalCompleted = Math.floor(c.visits.length / 5);
   if (cycleVisits === 0 && c.visits.length > 0 && totalCompleted > c.freeUsed) {
-    // They are eligible for free — register it as free
     showAlert('🎁 هذه الزيارة مجانية! تهانينا!');
     c.freeUsed = totalCompleted;
   }
@@ -486,15 +508,17 @@ function renderCard(c) {
     statusEl.textContent = 'تبقّى لك ' + remaining + ' زيارات للحصول على الحلاقة المجانية';
   }
 
-  // Visit dates
+  // Visit dates — show last 5 with correct visit number
   const datesList = document.getElementById('visit-dates-list');
   datesList.innerHTML = '';
   if (c.visits.length > 0) {
-    const recent = c.visits.slice(-5).reverse();
+    const total = c.visits.length;
+    const recent = c.visits.slice(-5);
     recent.forEach((v, i) => {
+      const visitNum = total - (recent.length - 1 - i);
       const row = document.createElement('div');
       row.className = 'visit-date-row';
-      row.innerHTML = `<span class="visit-date-label">زيارة ${c.visits.length - i}</span>
+      row.innerHTML = `<span class="visit-date-label">زيارة ${visitNum}</span>
                        <span class="visit-date-val">${formatDateShort(v.date)}</span>`;
       datesList.appendChild(row);
     });
@@ -550,7 +574,7 @@ function restoreByCode() {
 // ══════════════════════════════════════════════
 //  OWNER
 // ══════════════════════════════════════════════
-const OWNER_PASS = '1234'; // غيّر كلمة المرور من هنا
+const OWNER_PASS = '2456'; // غيّر كلمة المرور من هنا
 
 function ownerLogin() {
   const pass = document.getElementById('inp-pass').value;
@@ -600,16 +624,30 @@ function renderOwnerPanel() {
     const lastVisitDate = c.visits.length ? formatDateShort(c.visits[c.visits.length-1].date) : '—';
     const firstVisitDate = c.visits.length ? formatDateShort(c.visits[0].date) : '—';
 
+    // Build all visit dates rows
+    const visitRows = c.visits.map((v, idx) =>
+      `<div style="display:flex;justify-content:space-between;padding:5px 10px;font-size:12px;color:#555;border-bottom:1px solid #f5f5f5;">
+        <span>زيارة ${idx + 1}</span>
+        <span style="direction:ltr;">${formatDateShort(v.date)}</span>
+       </div>`
+    ).reverse().join('');
+
+    const rowId = 'visits-' + phone.replace(/\D/g,'');
     const row = document.createElement('div');
-    row.className = 'customer-row';
+    row.style.borderBottom = '1px solid #f0f0f0';
     row.innerHTML = `
-      <div class="customer-info">
-        <div class="customer-name">${c.name}</div>
-        <div class="customer-phone">${c.phone}</div>
-        <div class="customer-last-date">أول زيارة: ${firstVisitDate}</div>
+      <div class="customer-row" style="border-bottom:none !important;cursor:pointer;" onclick="toggleVisits('${rowId}')">
+        <div class="customer-info">
+          <div class="customer-name">${c.name}</div>
+          <div class="customer-phone">${c.phone}</div>
+          <div class="customer-last-date">أول زيارة: ${firstVisitDate}</div>
+        </div>
+        <div class="col-date-val">${lastVisitDate}</div>
+        <div class="visits-badge ${isFree ? 'free-visit' : ''}">${displayCount} / 5${isFree ? ' 🎁' : ''}</div>
       </div>
-      <div class="col-date-val">${lastVisitDate}</div>
-      <div class="visits-badge ${isFree ? 'free-visit' : ''}">${displayCount} / 5${isFree ? ' 🎁' : ''}</div>
+      <div id="${rowId}" style="display:none;background:#fafafa;padding:5px 0 10px;">
+        ${visitRows}
+      </div>
     `;
     container.appendChild(row);
   });
@@ -662,6 +700,11 @@ function importData(event) {
   };
   reader.readAsText(file);
   event.target.value = '';
+}
+
+function toggleVisits(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
 </script>
 </body>
