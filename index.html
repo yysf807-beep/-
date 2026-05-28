@@ -252,7 +252,7 @@
 <div class="alert" id="alert-box"></div>
 
 <script>
-// تأكد من ضبط إعدادات النشر لـ Google Sheets لتكون لمن يملك الوصول: Anyone (الجميع)
+// تم ربط الكود بجدول بيانات تموج المقص بنجاح
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbxibKd4s6GgoksZm4RUex4mkXZUtU2Wol6mrP6BZk19zsu-mDIq4u72u0b8JSOetJI/exec";
 const OWNER_PASSWORD = "2456";
 const LOCK_HOURS = 24;
@@ -326,7 +326,6 @@ function registerVisit() {
 
   document.getElementById('btn-register').disabled = true;
 
-  // إرسال البيانات عبر دالة GET متوافقة بالكامل ومستقرة لتجنب قيود الحماية نهائياً
   var fullUrl = SHEET_URL + "?action=addVisit&name=" + encodeURIComponent(name) + "&phone=" + encodeURIComponent(phone);
 
   fetch(fullUrl)
@@ -348,7 +347,6 @@ function registerVisit() {
   })
   .catch(function() {
     document.getElementById('btn-register').disabled = false;
-    // دعم الحفظ والتحويل الفوري محلياً لحماية تجربة العميل عند ضعف اتصال شبكة الجوال
     var visits = parseInt(localStorage.getItem('tm_visits') || "0") + 1;
     if(visits > 5) visits = 1;
     localStorage.setItem('tm_phone', phone);
